@@ -246,7 +246,9 @@ int byteSwap(int x, int n, int m) {
  */
 int isNotEqual(int x, int y) {
   // 补码定义
-  return !!(x+(~y+1));
+  // 亦可xor定义 
+  // return !!(x+(~y+1));
+  return !!(x^y);
 }
 /* 
  * float_neg - Return bit-level equivalent of expression -f for
@@ -260,7 +262,14 @@ int isNotEqual(int x, int y) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
- return 2;
+  // 如果是NAN
+  if((uf&0x7fffffff) > 0x7f800000) { 
+    return uf;
+  }
+  // 否则直接变换符号位
+  else {
+    return uf^0x80000000;
+  }
 }
 /* 
  * implication - return x -> y in propositional logic - 0 for false, 1
