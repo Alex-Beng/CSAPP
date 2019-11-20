@@ -197,7 +197,8 @@ int upperBits(int n) {
  *   Rating: 2
  */
 int anyEvenBit(int x) {
-  return 2;
+  // 每次检查用 01010101&低8位(即0x55)
+  return !!((x|(x>>8)|(x>>16)|(x>>24))&0x55);
 }
 /* 
  * leastBitPos - return a mask that marks the position of the
