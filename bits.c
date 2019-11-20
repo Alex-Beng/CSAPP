@@ -209,7 +209,10 @@ int anyEvenBit(int x) {
  *   Rating: 2 
  */
 int leastBitPos(int x) {
-  return 2;
+  // 对于10000
+  // 取反+1也为10000
+  // 但是前面全部取反
+  return x&(~x+1);
 }
 /* 
  * byteSwap - swaps the nth byte and the mth byte
