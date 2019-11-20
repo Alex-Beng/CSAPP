@@ -224,9 +224,13 @@ int leastBitPos(int x) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
+    // 首先将nth和mth位的byte挖掉
+    // 然后反着填回去
+
     int n_mask = (0xff)<<(n<<3);
     int m_mask = (0xff)<<(m<<3);
     int mask = ~n_mask & ~m_mask;
+
     int bn = (x>>(n<<3))&0xff;
     int bm = (x>>(m<<3))&0xff;
     x = x&mask;
@@ -241,7 +245,8 @@ int byteSwap(int x, int n, int m) {
  *   Rating: 2
  */
 int isNotEqual(int x, int y) {
-  return 2;
+  // 补码定义
+  return !!(x+(~y+1));
 }
 /* 
  * float_neg - Return bit-level equivalent of expression -f for
