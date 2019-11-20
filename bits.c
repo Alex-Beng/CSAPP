@@ -295,7 +295,10 @@ int implication(int x, int y) {
  *   Rating: 3
  */
 int bitMask(int highbit, int lowbit) {
-  return 2;
+  // xor定义, 同时交上0xffffffff<<lowbit保证 lowbit>highbit时为0
+  // 注意超过32位编译器进行%32操作
+  return ((((~0) << highbit) << 1) ^ ((~0) << lowbit)) & ((~0) << lowbit);
+  // return (((~0)<<(highbit+1)) ^ ((~0)<<lowbit)) & ((~0)<<lowbit);
 }
 /* 
  * conditional - same as x ? y : z 
