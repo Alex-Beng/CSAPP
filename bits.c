@@ -281,7 +281,8 @@ unsigned float_neg(unsigned uf) {
  *   Rating: 2
  */
 int implication(int x, int y) {
-    return 2;
+    // 逻辑蕴含x->y == ~x+y
+    return (!x)|(!!y);
 }
 /* 
  * bitMask - Generate a mask consisting of all 1's 
