@@ -308,7 +308,11 @@ int bitMask(int highbit, int lowbit) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  // mask可以有两种方式得到
+  // 之后就是数电知识实现简单if/else
+  // int mask = ((!!x)<<31)>>31;
+  int mask = ~!!x + 1;
+  return (mask&y)|(~mask&z);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
