@@ -172,6 +172,7 @@ NOTES:
  *   Rating: 1
  */
 int bitAnd(int x, int y) {
+  // 简单数电知识。
   return ~(~x|~y);
 }
 /* 
@@ -183,7 +184,10 @@ int bitAnd(int x, int y) {
  *  Rating: 1
  */
 int upperBits(int n) {
-  return 2;
+  // 若n不为零 则为0x80000000算术右移n-1位
+  // 若n为零   则为零
+  return (((!!n)<<31)>>31) 
+        &((1<<31) >> (n+(~0)));
 }
 /* 
  * anyEvenBit - return 1 if any even-numbered bit in word set to 1
