@@ -224,7 +224,14 @@ int leastBitPos(int x) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+    int n_mask = (0xff)<<(n<<3);
+    int m_mask = (0xff)<<(m<<3);
+    int mask = ~n_mask & ~m_mask;
+    int bn = (x>>(n<<3))&0xff;
+    int bm = (x>>(m<<3))&0xff;
+    x = x&mask;
+    x = x|(bn<<(m<<3))|(bm<<(n<<3));
+    return x;
 }
 /* 
  * isNotEqual - return 0 if x == y, and 1 otherwise 
