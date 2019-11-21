@@ -338,7 +338,8 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+  // x=0 或者 x<0 返回0
+  return (!!x) & !(x>>31);
 }
 /*
  * satMul3 - multiplies by 3, saturating to Tmin or Tmax if overflow
