@@ -2,3 +2,6 @@ dlc
 ishow
 btest
 fshow
+
+*.out
+*.o

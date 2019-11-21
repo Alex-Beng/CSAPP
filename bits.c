@@ -322,7 +322,13 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  // 注意输入的x y使用补码表示 
+  // 符号相同为1, 不同为0
+  // 符号相同则相减(补码定义) 不同则与x符号位相同
+  // x-y<0即x+(~y+1) 或者x-y=0, 即x, y相等
+  int same_sign = !((x>>31)^(y>>31)); 
+  return (same_sign & ((((x+(~y+1))>>31)&1) | (!isNotEqual(x, y))) )
+      |((!same_sign)& (x>>31));
 }
 /* 
  * isPositive - return 1 if x > 0, return 0 otherwise 
