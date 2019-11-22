@@ -429,5 +429,8 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 int tc2sm(int x) {
-  return 2;
+  // 分正负 
+  int sign = x&(0x80<<24);
+  int sign_mask = ~(x>>31);
+  return sign | ((sign_mask&x) | ((~sign_mask)&(~x+1)) );
 }
