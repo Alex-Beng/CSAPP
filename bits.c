@@ -353,7 +353,30 @@ int isPositive(int x) {
  *  Rating: 3
  */
 int satMul3(int x) {
-    return 2;
+    // 一些不相关的(可以用双符号位判断溢出)
+    // 判断溢出
+    // 没有溢出，则输出
+    // 有溢出
+    //    若为向上溢出，返回Tmin
+    //    若为向下溢出，返回Tmax
+    int x1 = x;
+    int x2 = x<<1;
+    int x3 = x2+x;
+
+    int Tmin = 0x80<<24;
+    int Tmax = ~(1<<31);
+
+    // 分两倍溢出和三倍溢出
+    int x1_sign = (x1&Tmin)>>31;
+    int x2_sign = (x2&Tmin)>>31;
+    int x3_sign = (x3&Tmin)>>31;
+    int of_flag = (x1_sign^x2_sign)|(x1_sign^x3_sign);
+
+    int of_mask = (of_flag<<31)>>31;
+    int x1_mask = x1>>31;
+    return ((~of_mask)&x3) 
+          |
+          (of_mask&((x1_mask&Tmin) | ((~x1_mask)&Tmax) ));
 }
 /* 
  * float_half - Return bit-level equivalent of expression 0.5*f for
