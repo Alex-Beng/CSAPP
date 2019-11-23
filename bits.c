@@ -390,8 +390,60 @@ int satMul3(int x) {
  *   Rating: 4
  */
 unsigned float_half(unsigned uf) {
-  return 2;
+  // 需要对ieee754有深刻理解
+  // +-----------------------------+
+  // | value   | Exp   | Fraction  |
+  // +-----------------------------+
+  // |   0     | 0     |  0        |
+  // | 非规约   | 0     |  非零值    |
+  // | 规约式   | 1-254 |  任意值    |
+  // | 无穷值   | 255   |  0        |
+  // | NaN     | 255   |  非零值    |
+  // +-----------------------------+
+  // 思路如下
+  // if is NaN/无穷值
+  //      return uf
+  // else 
+  //      if is 非规约/0 #因为处理方法一致
+  //          直接右移一位(注意有舍入)
+  //      
+  //      else #只剩规格化数了
+  //          if 有阶码下溢
+  //              需要变成非规约数
+  //          else 
+  //              直接阶码右移一位
+  
+  // 舍入规则
+  // +---------+
+  // | 00  | 0 |
+  // | 01  | 0 |
+  // | 10  | 0 |
+  // | 11  | 1 |
+  // +---------+
+  int round = !((uf & 3) ^ 3);
+  int S = uf&0x80000000;
+  int E = uf&0x7F800000;
+  int F = uf&0x007FFFFF;
+
+  if ((E|F) >= 0x7f800000) { // NaN/无穷
+    return uf;
+  }
+  else {
+    if (!E) { // E全零 0/非规约
+      return S|((F>>1)+round);
+    }
+    else { // 规约数
+      if (E==0x800000) { // 会下溢
+        return S|(round+((E|F)>>1));
+      }
+      else { // 不会下溢
+        return S|(E-0x800000)|F;
+      }
+    }
+  }
 }
+
+
 /* 
  * float_i2f - Return bit-level equivalent of expression (float) x
  *   Result is returned as unsigned int, but
