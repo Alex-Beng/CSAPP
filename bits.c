@@ -327,7 +327,7 @@ int isLessOrEqual(int x, int y) {
   // 符号相同则相减(补码定义) 不同则与x符号位相同
   // x-y<0即x+(~y+1) 或者x-y=0, 即x, y相等
   int same_sign = !((x>>31)^(y>>31)); 
-  return (same_sign & ((((x+(~y+1))>>31)&1) | (!isNotEqual(x, y))) )
+  return (same_sign & ((((x+(~y+1))>>31)&1) | (!(x^y))) )
       |((!same_sign)& (x>>31));
 }
 /* 
@@ -407,7 +407,7 @@ unsigned float_half(unsigned uf) {
   //      if is 非规约/0 #因为处理方法一致
   //          直接右移一位(注意有舍入)
   //      
-  //      else #只剩规格化数了
+  //      else #只剩规约化数了
   //          if 有阶码下溢
   //              需要变成非规约数
   //          else 
@@ -454,7 +454,54 @@ unsigned float_half(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+  // 分别求S, E, F
+  // S 巨他妈好求
+  // E 需要注意int值域为-2^31 -> 2^31-1, 需要对0x80000000特殊处理, 其他可以跟正数一致
+  // F 需要考虑舍入的问题
+
+  int S, E, F;
+  int abs_x, t, round;
+
+  if (!x) { // x=0直接返回
+    return x;
+  }
+
+  // 求S
+  
+  S = x&0x80000000;
+
+  abs_x = (S?(-x):x);
+
+  // 求E
+  t = 30;
+  if (x == 0x80000000) { 
+    E = 31+127;
+  }
+  else {
+    while (!(abs_x>>t)) { //找第一个不为零的bit, 注意全0需要特判
+      t--;
+    }
+    E = t+127;
+  }
+  
+  // 求F
+  abs_x <<= (31-t);
+  F = (abs_x>>8)&0x7fffff; //取24位
+  // 舍入规则
+  // 大于一半进位, 小于一半舍入, 等于向偶数进
+  abs_x = abs_x&0xff;
+  round = abs_x>128 || ((abs_x==128)&&(F&1));
+  F += round;
+
+  // 如果舍入之后超过23位(即24位进位成1)
+  // 尾数取23位, 阶码+1
+  if (F>>23) {
+    F &= 0x7fffff;
+    E += 1;
+  }
+
+  E <<= 23;
+  return S|E|F;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -469,7 +516,7 @@ unsigned float_i2f(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  
 }
 /* 
  * tc2sm - Convert from two's complement to sign-magnitude 
