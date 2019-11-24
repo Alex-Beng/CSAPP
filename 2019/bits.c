@@ -182,7 +182,8 @@ int minusOne(void) {
  *   Rating: 1
  */
 int fitsShort(int x) {
-  return 2;
+  int sign_mask = x>>31;
+  return !(sign_mask^(x>>15));
 }
 /* 
  * bitNor - ~(x|y) using only ~ and & 
@@ -192,7 +193,7 @@ int fitsShort(int x) {
  *   Rating: 1
  */
 int bitNor(int x, int y) {
-  return 2;
+  return (~x)&(~y);
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
