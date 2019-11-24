@@ -214,7 +214,10 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    return 2;
+  int sign_mask=x>>31;
+  int mask=(1<<n)+(~0);
+  int bias=sign_mask&mask;  
+  return (x+bias)>>n;  
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
@@ -225,7 +228,11 @@ int divpwr2(int x, int n) {
  *  Rating: 2
  */
 int sign(int x) {
-    return 2;
+  // x==0 
+  int sign_mask = x>>31;
+  int last = (sign_mask&1)^1;
+  int zero_mask = ((!!x)<<31)>>31;
+  return zero_mask&(sign_mask+last);
 }
 /* 
  * negate - return -x 
