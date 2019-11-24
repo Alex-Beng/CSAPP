@@ -254,7 +254,10 @@ int negate(int x) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
-  return 2;
+  // 不溢出则结果至少与一个操作数相同, 
+  // 否则都不同
+  int t_s = x+y;
+  return !(((t_s^x)&(t_s^y))>>31);
 }
 /*
  * ezThreeFourths - multiplies by 3/4 rounding toward 0,
