@@ -171,7 +171,7 @@ NOTES:
  *   Rating: 1
  */
 int minusOne(void) {
-  return 2;
+  return ~0;
 }
 /* 
  * fitsShort - return 1 if x can be represented as a 
