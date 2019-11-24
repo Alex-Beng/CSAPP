@@ -467,7 +467,6 @@ unsigned float_i2f(int x) {
   }
 
   // 求S
-  
   S = x&0x80000000;
 
   abs_x = (S?(-x):x);
@@ -514,9 +513,37 @@ unsigned float_i2f(int x) {
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
  *  Rating: 4
- */
+ */ 
 int howManyBits(int x) {
-  
+  // 如果为负数为-x-1, 如果为正数为x
+  // 即eg: howManyBits(-5) = howManyBits(4)
+  // 故可转为0-0x7fffffff需要多少个bit表示的问题(注意0特殊处理)
+  int new_x = x^(x>>31);
+
+  int zero_flag=!new_x;
+  int zero_mask=((!zero_flag)<<31)>>31;
+
+  // 高xx位1的数量
+  int bit_16,bit_8,bit_4,bit_2,bit_1;
+
+  // 对于高2^x位, 如果不为零, 需要1<<x位表示
+  bit_16 = (!!(new_x>>16))<<4;
+  new_x = new_x>>bit_16;
+
+  bit_8 = (!!(new_x>>8))<<3;
+  new_x = new_x>>bit_8;
+
+  bit_4 = (!!(new_x>>4))<<2;
+  new_x = new_x>>bit_4;
+
+  bit_2 = (!!(new_x>>2))<<1;
+  new_x = new_x>>bit_2;
+
+  bit_1 = (!!(new_x>>1))<<0;
+
+  x=bit_16+bit_8+bit_4+bit_2+bit_1+2;
+
+  return (zero_flag&(~zero_mask))|(x&(zero_mask));
 }
 /* 
  * tc2sm - Convert from two's complement to sign-magnitude 

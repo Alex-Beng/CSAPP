@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "bits.h"
 int main(int argc, char const *argv[]) {
-    printf("%.8x", float_i2f(0x80000001)<<23);
+    // printf("%.8x", float_i2f(0x80000001)<<23);
 
 
     // int ya = 0x80000001;
@@ -17,13 +17,15 @@ int main(int argc, char const *argv[]) {
 
     // printf("%.8x %.8x\n", ~ya, ~ya+1);
     // float_i2f(0);
-    return 0;
     for (int t=0x80000000; t<=0x7fffffff; t++){
-        // printf("%d", float_i2f(t));
+        if ((t^(t>>31)) != (-t-1) && (t^(t>>31)) != t)
+        // if ((t^(t>>31)) != (-t-1))
+            printf("%.8x\n", t^(t>>31));
         // break;
-        if (!float_i2f(t)) {
-            printf("%.8x\n", t);
-        }
+        // break;
+        // if (!float_i2f(t)) {
+        //     printf("%.8x\n", t);
+        // }
         // if ( ((~t+1)) != (-t)){
         //     printf("%.8x %.8x %.8x\n", t, (~t+1)&0x7fffffff, -t);
         // }
