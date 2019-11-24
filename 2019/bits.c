@@ -332,7 +332,15 @@ int rotateRight(int x, int n) {
  *   Rating: 4 
  */
 int greatestBitPos(int x) {
-  return 2;
+  // MSB利用二分弄成 [MSB]11111 的形式
+  // 然后取反右移(需要注意去掉算数右移带来的额外的1)1位
+  // 然后与x本体取交
+  x = x | x>>1;
+  x = x | x>>2;
+  x = x | x>>4;
+  x = x | x>>8;
+  x = x | x>>16;
+  return x & ((~x>>1)^0x80000000);
 }
 /* 
  * bang - Compute !x without using !
