@@ -315,6 +315,12 @@ int rempwr2(int x, int n) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
+  // 一个右移n位, 一个左移32-n位(性质-x=(~x+1))))
+  int n32_n = (32+(~n+1));
+
+  int left = (x>>n)&(~((~0)<<n32_n));
+  int right = x<<n32_n; 
+  return left|right;
 
 }
 /* 
