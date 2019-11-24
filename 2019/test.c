@@ -1,16 +1,12 @@
 #include <stdio.h>
-// #include "bits.h"
-int ezThreeFourths(int x) {
-    int a = (x << 1) + x;  //a = x * 3;
-  int flag = !!(a & (1<<31));
-  int b = a + (0x3 & (flag | flag << 1));
-  return b >> 2;
-}
+#include "bits.h"
+
 
 int main(int argc, char const *argv[]) {
-    int x = 1073741826;
-    printf("%.8x %.8x %.8x\n", ezThreeFourths(x), x, (x << 1) + x);
-    return 0;
+    printf("%.8x", 7<<-1);
+    // int x = 1073741826;
+    // printf("%.8x %.8x %.8x\n", ezThreeFourths(x), x, (x << 1) + x);
+    // return 0;
 
     // int ya = 0x80000001;
     // ya = (~ya+1);

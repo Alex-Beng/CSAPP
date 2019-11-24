@@ -377,8 +377,35 @@ int bang(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  
-  return 2;
+  int S = uf&0x80000000;
+  int E = uf&0x7F800000;
+  int F = uf&0x007FFFFF;
+  int abs;
+  // 0和非规约
+  if (!E) {
+    return 0;
+  }
+  // 无穷和NaN
+  if ((E|F) >= 0x7f800000) {
+    return 0x80000000;
+  }
+
+  // 只剩规约数
+  E = E>>23;
+  if (E<0x7f){
+    return 0;
+  }
+  if (E>157){
+    return 0x80000000;
+  }
+
+  abs=(0x40000000+(F<<7))>>(157-E);
+  if (S){
+    return -abs;
+  }
+  else {
+    return abs;
+  }
 }
 /* 
  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -406,14 +433,14 @@ unsigned float_twice(unsigned uf) {
   // if is NaN/无穷值
   //      return uf
   // else 
-  //      if is 规约数
-  //          直接左移一位
-  //      
-  //      else #只剩规非规约数和零
+  //      if is 非规约数和零
   //          if 有阶码上溢
   //              需要变成规约数
   //          else 
   //              直接阶码左移一位
+  //      else 规约数
+  //          直接左移一位
+  //      
   int S = uf&0x80000000;
   int E = uf&0x7F800000;
   int F = uf&0x007FFFFF;
