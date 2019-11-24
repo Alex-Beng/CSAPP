@@ -350,7 +350,19 @@ int greatestBitPos(int x) {
  *   Rating: 4 
  */
 int bang(int x) {
-  return 2;
+  // // 可以像上面一样二分做, 但是符号刚好12
+  // x = x | x>>16;
+  // x = x | x>>8;
+  // x = x | x>>4;
+  // x = x | x>>2;
+  // x = x | x>>1;
+  // // 取最后一位, 然后取反
+  // return (x&1)^1;
+
+  // 与自己相反数, 只有0符号位为0, 否则都是Tmin
+  int neg = ~x+1;
+  return ((neg|x)>>31)+1;
+
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
@@ -365,6 +377,7 @@ int bang(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
+  
   return 2;
 }
 /* 
@@ -379,5 +392,46 @@ int float_f2i(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+  // 需要对ieee754有深刻理解
+  // +-----------------------------+
+  // | value   | Exp   | Fraction  |
+  // +-----------------------------+
+  // |   0     | 0     |  0        |
+  // | 非规约   | 0     |  非零值    |
+  // | 规约式   | 1-254 |  任意值    |
+  // | 无穷值   | 255   |  0        |
+  // | NaN     | 255   |  非零值    |
+  // +-----------------------------+
+  // 思路如下
+  // if is NaN/无穷值
+  //      return uf
+  // else 
+  //      if is 规约数
+  //          直接左移一位
+  //      
+  //      else #只剩规非规约数和零
+  //          if 有阶码上溢
+  //              需要变成规约数
+  //          else 
+  //              直接阶码左移一位
+  int S = uf&0x80000000;
+  int E = uf&0x7F800000;
+  int F = uf&0x007FFFFF;
+
+  if ((E|F) >= 0x7f800000) { // NaN/无穷
+    return uf;
+  }
+  else {
+    if (!E) { // E全零 0/非规约
+      if (F&0x400000) { // 会发生上溢
+        return S|(E+0x800000)|((F&0x3fffff)<<1);
+      }
+      else {
+        return S|E|(F<<1);
+      }
+    }
+    else { // 规约数
+      return S|(E+0x800000)|F;
+    }
+  }
 }
