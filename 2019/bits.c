@@ -203,7 +203,7 @@ int bitNor(int x, int y) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+  return !(((x&(x>>8)&(x>>16)&(x>>24))&0xaa)^0xaa);
 }
 /* 
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
