@@ -228,10 +228,11 @@ int divpwr2(int x, int n) {
  *  Rating: 2
  */
 int sign(int x) {
-  // x==0 
   int sign_mask = x>>31;
   int last = (sign_mask&1)^1;
   int zero_mask = ((!!x)<<31)>>31;
+
+  // x==0 / x!=0
   return zero_mask&(sign_mask+last);
 }
 /* 
@@ -242,7 +243,7 @@ int sign(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return (~x+1);
 }
 /* 
  * addOK - Determine if can compute x+y without overflow
