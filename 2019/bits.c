@@ -289,7 +289,7 @@ int isGreater(int x, int y) {
   // 符号相同则 y-x<0
   // y-x<0即y+(~x+1)
   int same_sign = !((x^y)>>31); 
-  return (same_sign&( ((y+(~x+1))>>31)&1 )) | 
+  return (same_sign&( (y+(~x+1))>>31)) | 
   ((!same_sign)&(y>>31));
 }
 /* 
@@ -301,7 +301,10 @@ int isGreater(int x, int y) {
  *   Rating: 3
  */
 int rempwr2(int x, int n) {
-    return 2;
+  int left_mask = ~((~0)<<n);
+	int ans = x&left_mask;
+  // 如果x和ans符号不同, 需要加上前面的1/0
+	return ans+((~left_mask)&((x&(~ans+1))>>31));
 }
 /* 
  * rotateRight - Rotate x to the right by n
@@ -312,7 +315,7 @@ int rempwr2(int x, int n) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
-  return 2;
+
 }
 /* 
  * greatestBitPos - return a mask that marks the position of the
