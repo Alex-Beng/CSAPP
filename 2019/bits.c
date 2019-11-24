@@ -271,7 +271,10 @@ int addOK(int x, int y) {
  *   Rating: 3
  */
 int ezThreeFourths(int x) {
-  return 2;
+  // 先乘三, 后除四, 除4方法跟上面divpwr一致
+  int x3 = (x << 1) + x;  
+  int sign_mask = x3>>31;
+  return (x3+(0x3&sign_mask))>>2;
 }
 /* 
  * isGreater - if x > y  then return 1, else return 0 
