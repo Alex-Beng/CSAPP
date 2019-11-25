@@ -232,12 +232,15 @@ int divpwr2(int x, int n) {
  *  Rating: 2
  */
 int sign(int x) {
+  // opt ops' num,
+  // 直接符号mask取或即可
   int sign_mask = x>>31;
-  int last = (sign_mask&1)^1;
-  int zero_mask = ((!!x)<<31)>>31;
+  return sign_mask | (!!x);
+  // int last = (sign_mask&1)^1;
+  // int zero_mask = ((!!x)<<31)>>31;
 
-  // x==0 / x!=0
-  return zero_mask&(sign_mask+last);
+  // // x==0 / x!=0n
+  // return zero_mask&(sign_mask+last);
 }
 /* 
  * negate - return -x 
