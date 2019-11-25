@@ -388,14 +388,16 @@ int float_f2i(unsigned uf) {
   int E = uf&0x7F800000;
   int F = uf&0x007FFFFF;
   int abs;
-  // 0和非规约
-  if (!E) {
-    return 0;
-  }
-  // 无穷和NaN
-  if ((E|F) >= 0x7f800000) {
-    return 0x80000000;
-  }
+  // opt ops' num
+  // 这一部分被后面的包含
+  // // 0和非规约
+  // if (!E) {
+  //   return 0;
+  // }
+  // // 无穷和NaN
+  // if ((E|F) >= 0x7f800000) {
+  //   return 0x80000000;
+  // }
 
   // 只剩规约数
   E = E>>23;
