@@ -461,14 +461,22 @@ unsigned float_twice(unsigned uf) {
   else {
     if (!E) { // E全零 0/非规约
       if (F&0x400000) { // 会发生上溢
-        return S|(E+0x800000)|((F&0x3fffff)<<1);
+        // return S|(E+0x800000)|((F&0x3fffff)<<1);
+        // E += 0x800000;
+        F = ((F&0x3fffff)<<1);
+        // just for less ops
+        goto puls_one;
       }
       else {
-        return S|E|(F<<1);
+        // return S|E|(F<<1);
+        F <<= 1;
       }
     }
     else { // 规约数
-      return S|(E+0x800000)|F;
+      // return S|(E+0x800000)|F;
+puls_one:
+      E += 0x800000;
     }
+    return S|E|F;
   }
 }
