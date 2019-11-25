@@ -203,7 +203,11 @@ int bitNor(int x, int y) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return !(((x&(x>>8)&(x>>16)&(x>>24))&0xaa)^0xaa);
+  // 可以用二分思想, 减掉两个
+  // return !(((x&(x>>8)&(x>>16)&(x>>24))&0xaa)^0xaa);
+  x &= (x>>16);
+  x &= (x>>8);
+  return !((x&0xaa)^0xaa);
 }
 /* 
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
