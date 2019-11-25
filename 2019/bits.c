@@ -340,7 +340,7 @@ int greatestBitPos(int x) {
   x = x | x>>4;
   x = x | x>>8;
   x = x | x>>16;
-  return x & ((~x>>1)^0x80000000);
+  return x & ((~x>>1)^(1<<31));
 }
 /* 
  * bang - Compute !x without using !
@@ -392,6 +392,7 @@ int float_f2i(unsigned uf) {
 
   // 只剩规约数
   E = E>>23;
+  // 去除不在int范围的数
   if (E<0x7f){
     return 0;
   }
