@@ -454,23 +454,26 @@ unsigned float_twice(unsigned uf) {
   int S = uf&0x80000000;
   int E = uf&0x7F800000;
   int F = uf&0x007FFFFF;
+  int t_F;
 
   if ((E|F) >= 0x7f800000) { // NaN/无穷
     return uf;
   }
   else {
     if (!E) { // E全零 0/非规约
-      if (F&0x400000) { // 会发生上溢
+      t_F = F;
+      F = F<<1;
+      if (t_F&0x400000) { // 会发生上溢
         // return S|(E+0x800000)|((F&0x3fffff)<<1);
         // E += 0x800000;
-        F = ((F&0x3fffff)<<1);
+        // F = F<<1;
         // just for less ops
         goto puls_one;
       }
-      else {
-        // return S|E|(F<<1);
-        F <<= 1;
-      }
+      // else {
+      //   // return S|E|(F<<1);
+      //   F <<= 1;
+      // }
     }
     else { // 规约数
       // return S|(E+0x800000)|F;
