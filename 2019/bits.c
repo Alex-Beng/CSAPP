@@ -219,7 +219,7 @@ int allOddBits(int x) {
  */
 int divpwr2(int x, int n) {
   int sign_mask=x>>31;
-  int mask=(1<<n)+(~0);
+  int mask=(1<<n)+sign_mask;
   int bias=sign_mask&mask;  
   return (x+bias)>>n;  
 }
