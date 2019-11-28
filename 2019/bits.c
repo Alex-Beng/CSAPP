@@ -291,13 +291,19 @@ int ezThreeFourths(int x) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-  // 注意输入的x y使用补码表示 
-  // 符号相同为0x00000000, 不同为0xffffffff
-  // 符号相同则 y-x<0
-  // y-x<0即y+(~x+1)
-  int same_sign = !((x^y)>>31); 
-  return (same_sign&( (y+(~x+1))>>31)) | 
-  ((!same_sign)&(y>>31));
+  // 同号时候 ~(((x^y)>>31)|y) 为-y-1
+  // 异号时候 ~(((x^y)>>31)|y) 为0
+  // 实质是利用 x>y+1 的符号位, 和异号时候与x符号位相反
+  return ( (x + ~(((x^y)>>31)|y) )>>31 ) + 1;
+  
+  // return (y+(~x+1)) >> 31 & 1;
+  // // 注意输入的x y使用补码表示 
+  // // 符号相同为0x00000000, 不同为0xffffffff
+  // // 符号相同则 y-x<0
+  // // y-x<0即y+(~x+1)
+  // int same_sign = !((x^y)>>31); 
+  // return (same_sign&( (y+(~x+1))>>31)) | 
+  // ((!same_sign)&(y>>31));
 }
 /* 
  * rempwr2 - Compute x%(2^n), for 0 <= n <= 30
