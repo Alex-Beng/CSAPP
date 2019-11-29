@@ -2,6 +2,7 @@ dlc
 ishow
 btest
 fshow
+bomb
 
 *.out
 *.o

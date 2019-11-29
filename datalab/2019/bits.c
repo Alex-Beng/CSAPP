@@ -295,7 +295,7 @@ int isGreater(int x, int y) {
   // 异号时候 ~(((x^y)>>31)|y) 为0
   // 实质是利用 x>y+1 的符号位, 和异号时候与x符号位相反
   return ( (x + ~(((x^y)>>31)|y) )>>31 ) + 1;
-  
+
   // return (y+(~x+1)) >> 31 & 1;
   // // 注意输入的x y使用补码表示 
   // // 符号相同为0x00000000, 不同为0xffffffff
@@ -316,7 +316,7 @@ int isGreater(int x, int y) {
 int rempwr2(int x, int n) {
   int left_mask = ~((~0)<<n);
 	int ans = x&left_mask;
-  // 如果x和ans符号不同, 需要加上前面的1/0
+  
 	return ans+((~left_mask)&((x&(~ans+1))>>31));
 }
 /* 
