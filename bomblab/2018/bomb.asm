@@ -359,7 +359,7 @@ Disassembly of section .text:
  8048b32:	c3                   	ret    
 
 08048b33 <phase_1>:
- 8048b33:	83 ec 14             	sub    $0x14,%esp
+ 8048b33:	83 ec 14             	sub    $0x14,%esp 
  8048b36:	68 24 a0 04 08       	push   $0x804a024
  8048b3b:	ff 74 24 1c          	pushl  0x1c(%esp)
  8048b3f:	e8 e6 04 00 00       	call   804902a <strings_not_equal>
