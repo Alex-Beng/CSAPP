@@ -316,7 +316,7 @@ Disassembly of section .text:
  8048a6d:	c7 04 24 a8 9f 04 08 	movl   $0x8049fa8,(%esp)
  8048a74:	e8 47 fd ff ff       	call   80487c0 <puts@plt>
  8048a79:	e8 03 07 00 00       	call   8049181 <read_line>
- 8048a7e:	89 04 24             	mov    %eax,(%esp)
+ 8048a7e:	89 04 24             	mov    %eax,(%esp) ;参数入栈
  8048a81:	e8 ad 00 00 00       	call   8048b33 <phase_1>
  8048a86:	e8 ef 07 00 00       	call   804927a <phase_defused>
  8048a8b:	c7 04 24 d4 9f 04 08 	movl   $0x8049fd4,(%esp)
@@ -371,9 +371,9 @@ Disassembly of section .text:
  8048b53:	c3                   	ret    
 
 08048b54 <phase_2>:
- 8048b54:	56                   	push   %esi
+ 8048b54:	56                   	push   %esi;保存esi, ebx
  8048b55:	53                   	push   %ebx
- 8048b56:	83 ec 2c             	sub    $0x2c,%esp
+ 8048b56:	83 ec 2c             	sub    $0x2c,%esp;分配栈空间
  8048b59:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048b5f:	89 44 24 24          	mov    %eax,0x24(%esp)
  8048b63:	31 c0                	xor    %eax,%eax
