@@ -361,6 +361,7 @@ Disassembly of section .text:
  8048b30:	55                   	push   %ebp
  8048b31:	89 e5                	mov    %esp,%ebp
  8048b33:	83 ec 10             	sub    $0x10,%esp
+ ;直接在这个地址里
  8048b36:	68 84 a1 04 08       	push   $0x804a184
  8048b3b:	ff 75 08             	pushl  0x8(%ebp)
  8048b3e:	e8 7d 04 00 00       	call   8048fc0 <strings_not_equal>
@@ -383,19 +384,24 @@ Disassembly of section .text:
  8048b66:	50                   	push   %eax
  8048b67:	ff 75 08             	pushl  0x8(%ebp)
  8048b6a:	e8 c4 06 00 00       	call   8049233 <read_six_numbers>
- 8048b6f:	83 c4 10             	add    $0x10,%esp
+ 8048b6f:	83 c4 10             	add    $0x10,%esp ;pop
  8048b72:	83 7d dc 00          	cmpl   $0x0,-0x24(%ebp)
  8048b76:	79 05                	jns    8048b7d <phase_2+0x2c>
  8048b78:	e8 76 06 00 00       	call   80491f3 <explode_bomb>
+;大概是 for (int i=0; i<6; i++)
+; 			nums[i] = nums[i-1]+i
  8048b7d:	bb 01 00 00 00       	mov    $0x1,%ebx
  8048b82:	89 d8                	mov    %ebx,%eax
  8048b84:	03 44 9d d8          	add    -0x28(%ebp,%ebx,4),%eax
  8048b88:	39 44 9d dc          	cmp    %eax,-0x24(%ebp,%ebx,4)
  8048b8c:	74 05                	je     8048b93 <phase_2+0x42>
+
  8048b8e:	e8 60 06 00 00       	call   80491f3 <explode_bomb>
+
  8048b93:	83 c3 01             	add    $0x1,%ebx
  8048b96:	83 fb 06             	cmp    $0x6,%ebx
  8048b99:	75 e7                	jne    8048b82 <phase_2+0x31>
+
  8048b9b:	8b 45 f4             	mov    -0xc(%ebp),%eax
  8048b9e:	65 33 05 14 00 00 00 	xor    %gs:0x14,%eax
  8048ba5:	74 05                	je     8048bac <phase_2+0x5b>
@@ -408,6 +414,7 @@ Disassembly of section .text:
  8048bb1:	55                   	push   %ebp
  8048bb2:	89 e5                	mov    %esp,%ebp
  8048bb4:	83 ec 18             	sub    $0x18,%esp
+ ;正文分隔符
  8048bb7:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048bbd:	89 45 f4             	mov    %eax,-0xc(%ebp)
  8048bc0:	31 c0                	xor    %eax,%eax
@@ -415,50 +422,75 @@ Disassembly of section .text:
  8048bc5:	50                   	push   %eax
  8048bc6:	8d 45 ec             	lea    -0x14(%ebp),%eax
  8048bc9:	50                   	push   %eax
+ ;看到是"%d %d" 输入两个整数
  8048bca:	68 11 a4 04 08       	push   $0x804a411
  8048bcf:	ff 75 08             	pushl  0x8(%ebp)
  8048bd2:	e8 39 fc ff ff       	call   8048810 <__isoc99_sscanf@plt>
- 8048bd7:	83 c4 10             	add    $0x10,%esp
+ 8048bd7:	83 c4 10             	add    $0x10,%esp ;结束调用
+;eax存的是sscanf的返回值, 必须大于一(输入两个整数返回2)
  8048bda:	83 f8 01             	cmp    $0x1,%eax
- 8048bdd:	7f 05                	jg     8048be4 <phase_3+0x33>
+ 8048bdd:	7f 05                	jg     8048be4 <phase_3+0x33> ;
+
  8048bdf:	e8 0f 06 00 00       	call   80491f3 <explode_bomb>
+;-0x14(%ebp)存的是输入的第一个数
+;-0x10(%ebp)是第二个
+;第一个数要大于/不等于7时候爆炸
+;即第一个数要<=7
  8048be4:	83 7d ec 07          	cmpl   $0x7,-0x14(%ebp)
  8048be8:	77 63                	ja     8048c4d <phase_3+0x9c>
+;switch分支?
+;*0x804a1e0 是 0x8048bf4
  8048bea:	8b 45 ec             	mov    -0x14(%ebp),%eax
  8048bed:	ff 24 85 e0 a1 04 08 	jmp    *0x804a1e0(,%eax,4)
+ 
  8048bf4:	b8 dc 02 00 00       	mov    $0x2dc,%eax
  8048bf9:	eb 05                	jmp    8048c00 <phase_3+0x4f>
+
  8048bfb:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c00:	83 e8 51             	sub    $0x51,%eax
  8048c03:	eb 05                	jmp    8048c0a <phase_3+0x59>
+
  8048c05:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c0a:	05 07 01 00 00       	add    $0x107,%eax
  8048c0f:	eb 05                	jmp    8048c16 <phase_3+0x65>
+
  8048c11:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c16:	2d 37 01 00 00       	sub    $0x137,%eax
  8048c1b:	eb 05                	jmp    8048c22 <phase_3+0x71>
+
  8048c1d:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c22:	05 37 01 00 00       	add    $0x137,%eax
  8048c27:	eb 05                	jmp    8048c2e <phase_3+0x7d>
+
  8048c29:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c2e:	2d 37 01 00 00       	sub    $0x137,%eax
  8048c33:	eb 05                	jmp    8048c3a <phase_3+0x89>
+
  8048c35:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c3a:	05 37 01 00 00       	add    $0x137,%eax
  8048c3f:	eb 05                	jmp    8048c46 <phase_3+0x95>
+
  8048c41:	b8 00 00 00 00       	mov    $0x0,%eax
  8048c46:	2d 37 01 00 00       	sub    $0x137,%eax
  8048c4b:	eb 0a                	jmp    8048c57 <phase_3+0xa6>
+
  8048c4d:	e8 a1 05 00 00       	call   80491f3 <explode_bomb>
+
  8048c52:	b8 00 00 00 00       	mov    $0x0,%eax
+ ;第一个输入1时到这, 
+ ;第一个数>5爆炸
  8048c57:	83 7d ec 05          	cmpl   $0x5,-0x14(%ebp)
  8048c5b:	7f 05                	jg     8048c62 <phase_3+0xb1>
+;第一个输入为1时, 第二个数为-129
  8048c5d:	3b 45 f0             	cmp    -0x10(%ebp),%eax
  8048c60:	74 05                	je     8048c67 <phase_3+0xb6>
+
  8048c62:	e8 8c 05 00 00       	call   80491f3 <explode_bomb>
+
  8048c67:	8b 45 f4             	mov    -0xc(%ebp),%eax
  8048c6a:	65 33 05 14 00 00 00 	xor    %gs:0x14,%eax
  8048c71:	74 05                	je     8048c78 <phase_3+0xc7>
+
  8048c73:	e8 18 fb ff ff       	call   8048790 <__stack_chk_fail@plt>
  8048c78:	c9                   	leave  
  8048c79:	c3                   	ret    
