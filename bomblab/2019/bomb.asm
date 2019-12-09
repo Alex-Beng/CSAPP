@@ -500,18 +500,31 @@ Disassembly of section .text:
  8048c7b:	89 e5                	mov    %esp,%ebp
  8048c7d:	56                   	push   %esi
  8048c7e:	53                   	push   %ebx
+ ;以下正文
+ ;0x8(%ebp)  是第一个参数 	 p1
+ ;0xc(%ebp)  第二个			p2
+ ;0x10(%ebp) 第三个			p3
  8048c7f:	8b 55 08             	mov    0x8(%ebp),%edx
  8048c82:	8b 4d 0c             	mov    0xc(%ebp),%ecx
  8048c85:	8b 75 10             	mov    0x10(%ebp),%esi
+; eax = p3-p2
+; ebx = eax
  8048c88:	89 f0                	mov    %esi,%eax
  8048c8a:	29 c8                	sub    %ecx,%eax
  8048c8c:	89 c3                	mov    %eax,%ebx
+; ebx = ebx>>31;
+; eax += ebx
  8048c8e:	c1 eb 1f             	shr    $0x1f,%ebx
  8048c91:	01 d8                	add    %ebx,%eax
+; eax = eax>>1
  8048c93:	d1 f8                	sar    %eax
+; ebx = (eax + p2*1)
  8048c95:	8d 1c 08             	lea    (%eax,%ecx,1),%ebx
+; ebx <= p1 跳转
  8048c98:	39 d3                	cmp    %edx,%ebx
  8048c9a:	7e 15                	jle    8048cb1 <func4+0x37>
+
+;递归调用
  8048c9c:	83 ec 04             	sub    $0x4,%esp
  8048c9f:	8d 43 ff             	lea    -0x1(%ebx),%eax
  8048ca2:	50                   	push   %eax
@@ -519,11 +532,17 @@ Disassembly of section .text:
  8048ca4:	52                   	push   %edx
  8048ca5:	e8 d0 ff ff ff       	call   8048c7a <func4>
  8048caa:	83 c4 10             	add    $0x10,%esp
+ 
  8048cad:	01 d8                	add    %ebx,%eax
  8048caf:	eb 19                	jmp    8048cca <func4+0x50>
+
+; 如果是 8048c9a 跳转过来的
+; 此时edx为p1 ebx为 (eax + p2*1)
+; ebx >= edx 则跳转
  8048cb1:	89 d8                	mov    %ebx,%eax
  8048cb3:	39 d3                	cmp    %edx,%ebx
  8048cb5:	7d 13                	jge    8048cca <func4+0x50>
+
  8048cb7:	83 ec 04             	sub    $0x4,%esp
  8048cba:	56                   	push   %esi
  8048cbb:	8d 43 01             	lea    0x1(%ebx),%eax
@@ -531,7 +550,9 @@ Disassembly of section .text:
  8048cbf:	52                   	push   %edx
  8048cc0:	e8 b5 ff ff ff       	call   8048c7a <func4>
  8048cc5:	83 c4 10             	add    $0x10,%esp
+
  8048cc8:	01 d8                	add    %ebx,%eax
+
  8048cca:	8d 65 f8             	lea    -0x8(%ebp),%esp
  8048ccd:	5b                   	pop    %ebx
  8048cce:	5e                   	pop    %esi
@@ -542,6 +563,7 @@ Disassembly of section .text:
  8048cd1:	55                   	push   %ebp
  8048cd2:	89 e5                	mov    %esp,%ebp
  8048cd4:	83 ec 18             	sub    $0x18,%esp
+ ;以下正文
  8048cd7:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048cdd:	89 45 f4             	mov    %eax,-0xc(%ebp)
  8048ce0:	31 c0                	xor    %eax,%eax
@@ -549,23 +571,35 @@ Disassembly of section .text:
  8048ce5:	50                   	push   %eax
  8048ce6:	8d 45 ec             	lea    -0x14(%ebp),%eax
  8048ce9:	50                   	push   %eax
+ ; 又是"%d %d" ! AGAIN!
  8048cea:	68 11 a4 04 08       	push   $0x804a411
  8048cef:	ff 75 08             	pushl  0x8(%ebp)
  8048cf2:	e8 19 fb ff ff       	call   8048810 <__isoc99_sscanf@plt>
  8048cf7:	83 c4 10             	add    $0x10,%esp
+
+;不等于2就炸, 常操
  8048cfa:	83 f8 02             	cmp    $0x2,%eax
  8048cfd:	75 06                	jne    8048d05 <phase_4+0x34>
+ 
+;jbe 小于或等于跳转
+;即第一个输入要小于0xe, 即14
  8048cff:	83 7d ec 0e          	cmpl   $0xe,-0x14(%ebp)
  8048d03:	76 05                	jbe    8048d0a <phase_4+0x39>
+
  8048d05:	e8 e9 04 00 00       	call   80491f3 <explode_bomb>
+
+;压栈 调用func4(param_1, 0, 14)
  8048d0a:	83 ec 04             	sub    $0x4,%esp
  8048d0d:	6a 0e                	push   $0xe
  8048d0f:	6a 00                	push   $0x0
  8048d11:	ff 75 ec             	pushl  -0x14(%ebp)
  8048d14:	e8 61 ff ff ff       	call   8048c7a <func4>
  8048d19:	83 c4 10             	add    $0x10,%esp
+
+;eax 存放func4返回值, 需要等于0xf
  8048d1c:	83 f8 0f             	cmp    $0xf,%eax
  8048d1f:	75 06                	jne    8048d27 <phase_4+0x56>
+;第二个参数=15
  8048d21:	83 7d f0 0f          	cmpl   $0xf,-0x10(%ebp)
  8048d25:	74 05                	je     8048d2c <phase_4+0x5b>
  8048d27:	e8 c7 04 00 00       	call   80491f3 <explode_bomb>
