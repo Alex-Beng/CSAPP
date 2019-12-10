@@ -18,6 +18,8 @@ int f(int a, int b, int c) {
 }
 
 int main(int argc, char const *argv[]) {
+    int a = 'b';
+    printf("%.8x", a);
     /**
      * for phase 5
      */

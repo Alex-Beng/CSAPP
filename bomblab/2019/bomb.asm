@@ -820,14 +820,17 @@ Disassembly of section .text:
  8048e6c:	55                   	push   %ebp
  8048e6d:	89 e5                	mov    %esp,%ebp
  8048e6f:	53                   	push   %ebx
+ ;以下正文
  8048e70:	83 ec 04             	sub    $0x4,%esp
- 8048e73:	8b 55 08             	mov    0x8(%ebp),%edx
- 8048e76:	8b 4d 0c             	mov    0xc(%ebp),%ecx
+ 8048e73:	8b 55 08             	mov    0x8(%ebp),%edx;参数1
+ 8048e76:	8b 4d 0c             	mov    0xc(%ebp),%ecx;参数2
  8048e79:	85 d2                	test   %edx,%edx
  8048e7b:	74 37                	je     8048eb4 <fun7+0x48>
- 8048e7d:	8b 1a                	mov    (%edx),%ebx
+ 8048e7d:	8b 1a                	mov    (%edx),%ebx;36
+;if 36<参数2跳转
  8048e7f:	39 cb                	cmp    %ecx,%ebx
  8048e81:	7e 13                	jle    8048e96 <fun7+0x2a>
+
  8048e83:	83 ec 08             	sub    $0x8,%esp
  8048e86:	51                   	push   %ecx
  8048e87:	ff 72 04             	pushl  0x4(%edx)
@@ -835,13 +838,15 @@ Disassembly of section .text:
  8048e8f:	83 c4 10             	add    $0x10,%esp
  8048e92:	01 c0                	add    %eax,%eax
  8048e94:	eb 23                	jmp    8048eb9 <fun7+0x4d>
+
  8048e96:	b8 00 00 00 00       	mov    $0x0,%eax
  8048e9b:	39 cb                	cmp    %ecx,%ebx
  8048e9d:	74 1a                	je     8048eb9 <fun7+0x4d>
+
  8048e9f:	83 ec 08             	sub    $0x8,%esp
  8048ea2:	51                   	push   %ecx
  8048ea3:	ff 72 08             	pushl  0x8(%edx)
- 8048ea6:	e8 c1 ff ff ff       	call   8048e6c <fun7>
+ 8048ea6:	e8 c1 ff ff ff       	call   8048e6c <fun7>;来了来了,递归了
  8048eab:	83 c4 10             	add    $0x10,%esp
  8048eae:	8d 44 00 01          	lea    0x1(%eax,%eax,1),%eax
  8048eb2:	eb 05                	jmp    8048eb9 <fun7+0x4d>
@@ -854,28 +859,36 @@ Disassembly of section .text:
  8048ebe:	55                   	push   %ebp
  8048ebf:	89 e5                	mov    %esp,%ebp
  8048ec1:	53                   	push   %ebx
+ ;以下正文
  8048ec2:	83 ec 04             	sub    $0x4,%esp
  8048ec5:	e8 a3 03 00 00       	call   804926d <read_line>
  8048eca:	83 ec 04             	sub    $0x4,%esp
+; strtol@plt(eax, 0, a)
  8048ecd:	6a 0a                	push   $0xa
  8048ecf:	6a 00                	push   $0x0
  8048ed1:	50                   	push   %eax
  8048ed2:	e8 a9 f9 ff ff       	call   8048880 <strtol@plt>
+; 输入字符串第一个数字 n1-1<=1000
  8048ed7:	89 c3                	mov    %eax,%ebx
  8048ed9:	8d 40 ff             	lea    -0x1(%eax),%eax
  8048edc:	83 c4 10             	add    $0x10,%esp
  8048edf:	3d e8 03 00 00       	cmp    $0x3e8,%eax
  8048ee4:	76 05                	jbe    8048eeb <secret_phase+0x2d>
+
  8048ee6:	e8 08 03 00 00       	call   80491f3 <explode_bomb>
+; fun7('$', n1)
  8048eeb:	83 ec 08             	sub    $0x8,%esp
  8048eee:	53                   	push   %ebx
  8048eef:	68 a0 c0 04 08       	push   $0x804c0a0
  8048ef4:	e8 73 ff ff ff       	call   8048e6c <fun7>
  8048ef9:	83 c4 10             	add    $0x10,%esp
+;上面返回值要为2, 故应为fun7(a, 22)
+;暴力尝试得到为22(递归函数略恶心)
  8048efc:	83 f8 02             	cmp    $0x2,%eax
  8048eff:	74 05                	je     8048f06 <secret_phase+0x48>
  8048f01:	e8 ed 02 00 00       	call   80491f3 <explode_bomb>
  8048f06:	83 ec 0c             	sub    $0xc,%esp
+
  8048f09:	68 b4 a1 04 08       	push   $0x804a1b4
  8048f0e:	e8 ad f8 ff ff       	call   80487c0 <puts@plt>
  8048f13:	e8 58 04 00 00       	call   8049370 <phase_defused>
@@ -1257,13 +1270,16 @@ Disassembly of section .text:
  8049371:	89 e5                	mov    %esp,%ebp
  8049373:	83 ec 74             	sub    $0x74,%esp
  8049376:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
+;以下正文
  804937c:	89 45 f4             	mov    %eax,-0xc(%ebp)
  804937f:	31 c0                	xor    %eax,%eax
  8049381:	6a 01                	push   $0x1
  8049383:	e8 8e fd ff ff       	call   8049116 <send_msg>
  8049388:	83 c4 10             	add    $0x10,%esp
+
  804938b:	83 3d ec c7 04 08 06 	cmpl   $0x6,0x804c7ec
  8049392:	75 7b                	jne    804940f <phase_defused+0x9f>
+
  8049394:	83 ec 0c             	sub    $0xc,%esp
  8049397:	8d 45 a4             	lea    -0x5c(%ebp),%eax
  804939a:	50                   	push   %eax
@@ -1271,17 +1287,20 @@ Disassembly of section .text:
  804939e:	50                   	push   %eax
  804939f:	8d 45 9c             	lea    -0x64(%ebp),%eax
  80493a2:	50                   	push   %eax
- 80493a3:	68 6b a4 04 08       	push   $0x804a46b
- 80493a8:	68 f0 c8 04 08       	push   $0x804c8f0
+ 80493a3:	68 6b a4 04 08       	push   $0x804a46b; %d %d %s
+ 80493a8:	68 f0 c8 04 08       	push   $0x804c8f0; 第四个炸弹输入
  80493ad:	e8 5e f4 ff ff       	call   8048810 <__isoc99_sscanf@plt>
  80493b2:	83 c4 20             	add    $0x20,%esp
+; 输入三个东西!
  80493b5:	83 f8 03             	cmp    $0x3,%eax
  80493b8:	75 39                	jne    80493f3 <phase_defused+0x83>
+
  80493ba:	83 ec 08             	sub    $0x8,%esp
- 80493bd:	68 74 a4 04 08       	push   $0x804a474
+ 80493bd:	68 74 a4 04 08       	push   $0x804a474; 拆4 输入5 15 Paradise进入secret phase
  80493c2:	8d 45 a4             	lea    -0x5c(%ebp),%eax
  80493c5:	50                   	push   %eax
  80493c6:	e8 f5 fb ff ff       	call   8048fc0 <strings_not_equal>
+
  80493cb:	83 c4 10             	add    $0x10,%esp
  80493ce:	85 c0                	test   %eax,%eax
  80493d0:	75 21                	jne    80493f3 <phase_defused+0x83>
