@@ -532,7 +532,7 @@ Disassembly of section .text:
  8048ca4:	52                   	push   %edx
  8048ca5:	e8 d0 ff ff ff       	call   8048c7a <func4>
  8048caa:	83 c4 10             	add    $0x10,%esp
- 
+
  8048cad:	01 d8                	add    %ebx,%eax
  8048caf:	eb 19                	jmp    8048cca <func4+0x50>
 
@@ -614,23 +614,39 @@ Disassembly of section .text:
  8048d3f:	55                   	push   %ebp
  8048d40:	89 e5                	mov    %esp,%ebp
  8048d42:	53                   	push   %ebx
+
+;0x8(%ebp)是输入字符串指针
  8048d43:	83 ec 10             	sub    $0x10,%esp
  8048d46:	8b 5d 08             	mov    0x8(%ebp),%ebx
  8048d49:	53                   	push   %ebx
  8048d4a:	e8 4f 02 00 00       	call   8048f9e <string_length>
  8048d4f:	83 c4 10             	add    $0x10,%esp
+;长度要等于6
  8048d52:	83 f8 06             	cmp    $0x6,%eax
  8048d55:	74 05                	je     8048d5c <phase_5+0x1d>
+
  8048d57:	e8 97 04 00 00       	call   80491f3 <explode_bomb>
+
+; ecx = 0(循环结束ecx等于0x22则不炸)
+; for (eax=ebx; eax < ebx+6; eax++) { 遍历字符串
+; 	edx = 字符0拓展 
+;	edx = edx&0xf
+;	ecx += ()
+; }
  8048d5c:	89 d8                	mov    %ebx,%eax
  8048d5e:	83 c3 06             	add    $0x6,%ebx
  8048d61:	b9 00 00 00 00       	mov    $0x0,%ecx
+
  8048d66:	0f b6 10             	movzbl (%eax),%edx
- 8048d69:	83 e2 0f             	and    $0xf,%edx
+ 8048d69:	83 e2 0f             	and    $0xf,%edx;取每个字符
  8048d6c:	03 0c 95 00 a2 04 08 	add    0x804a200(,%edx,4),%ecx
+
  8048d73:	83 c0 01             	add    $0x1,%eax
  8048d76:	39 d8                	cmp    %ebx,%eax
  8048d78:	75 ec                	jne    8048d66 <phase_5+0x27>
+; 一个有趣的发现
+; 0x804a200+200
+; 0x804a2c8:      "you've found the secret phase!"
  8048d7a:	83 f9 22             	cmp    $0x22,%ecx
  8048d7d:	74 05                	je     8048d84 <phase_5+0x45>
  8048d7f:	e8 6f 04 00 00       	call   80491f3 <explode_bomb>
@@ -643,6 +659,8 @@ Disassembly of section .text:
  8048d8a:	89 e5                	mov    %esp,%ebp
  8048d8c:	56                   	push   %esi
  8048d8d:	53                   	push   %ebx
+ ;以下正文
+ ;熟悉的read_six_numbers
  8048d8e:	83 ec 48             	sub    $0x48,%esp
  8048d91:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048d97:	89 45 f4             	mov    %eax,-0xc(%ebp)
@@ -652,12 +670,18 @@ Disassembly of section .text:
  8048da0:	ff 75 08             	pushl  0x8(%ebp)
  8048da3:	e8 8b 04 00 00       	call   8049233 <read_six_numbers>
  8048da8:	83 c4 10             	add    $0x10,%esp
+ ; esi = 0
+ ; eax = ebp-0x3c
  8048dab:	be 00 00 00 00       	mov    $0x0,%esi
  8048db0:	8b 44 b5 c4          	mov    -0x3c(%ebp,%esi,4),%eax
+; eax -= 1
+; if eax <= 5 不爆炸
  8048db4:	83 e8 01             	sub    $0x1,%eax
  8048db7:	83 f8 05             	cmp    $0x5,%eax
  8048dba:	76 05                	jbe    8048dc1 <phase_6+0x38>
+
  8048dbc:	e8 32 04 00 00       	call   80491f3 <explode_bomb>
+ 
  8048dc1:	83 c6 01             	add    $0x1,%esi
  8048dc4:	83 fe 06             	cmp    $0x6,%esi
  8048dc7:	74 33                	je     8048dfc <phase_6+0x73>
