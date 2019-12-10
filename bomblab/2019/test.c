@@ -18,9 +18,50 @@ int f(int a, int b, int c) {
 }
 
 int main(int argc, char const *argv[]) {
-    for (int i=0; i<=255; i++) {
-        printf("%c,%d, %.8x\n", (char)i, i, i);
+    /**
+     * for phase 5
+     */
+    unsigned int ebx, esi, ecx, eax, edx;
+    unsigned int nums[]={6, 2, 3, 5, 4, 1, 
+                         0, 0, 0, 0, 0, 0};
+
+    ebx = 0;
+L1:
+    esi = ebx;
+    ecx = nums[ebx];
+    eax = 1;
+    edx = 0x804c154;
+    if (ecx > 1) {
+L2:
+        while (1) {
+            edx += 0x8;
+            eax += 1;
+            if (ecx == eax) {
+                break;
+            }
+        }
+        nums[6+esi] = edx; //这里不对
+        if (ebx != 6) {
+            goto L1;
+        }
+        else {
+            goto L3;
+        }
     }
+    else {
+        goto L2;
+    }
+L3:
+    printf("%.8x\n", ebx);
+    printf("%.8x\n", esi);
+    printf("%.8x\n", ecx);
+    printf("%.8x\n", eax);
+    printf("%.8x\n", edx);
+    printf("%.8x\n", nums[6]);
+
+    // for (int i=0; i<=255; i++) {
+    //     printf("%c,%d, %.8x\n", (char)i, i, i);
+    // }
 
     /**
      * for phase 4

@@ -23,7 +23,7 @@ Disassembly of section .plt:
  8048720:	ff 35 04 c0 04 08    	pushl  0x804c004
  8048726:	ff 25 08 c0 04 08    	jmp    *0x804c008
  804872c:	00 00                	add    %al,(%eax)
-	...
+    ...
 
 08048730 <read@plt>:
  8048730:	ff 25 0c c0 04 08    	jmp    *0x804c00c
@@ -661,6 +661,7 @@ Disassembly of section .text:
  8048d8d:	53                   	push   %ebx
  ;以下正文
  ;熟悉的read_six_numbers
+ ;艹, 记得给solution加回车,不然只读到5个字符
  8048d8e:	83 ec 48             	sub    $0x48,%esp
  8048d91:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048d97:	89 45 f4             	mov    %eax,-0xc(%ebp)
@@ -670,67 +671,141 @@ Disassembly of section .text:
  8048da0:	ff 75 08             	pushl  0x8(%ebp)
  8048da3:	e8 8b 04 00 00       	call   8049233 <read_six_numbers>
  8048da8:	83 c4 10             	add    $0x10,%esp
- ; esi = 0
- ; eax = ebp-0x3c
+; esi = 0
+; eax = ebp-0x3c
  8048dab:	be 00 00 00 00       	mov    $0x0,%esi
+; 嵌套两重循环, 即输入的6个数, 每个都不能大于6, 数不能重复
+; for (esi = 0; esi < 6; esi ++ ) 
  8048db0:	8b 44 b5 c4          	mov    -0x3c(%ebp,%esi,4),%eax
-; eax -= 1
-; if eax <= 5 不爆炸
+; -0x3c(%ebp, 0,4) 输入六个数字得到的数组基址
+; nums[esi]-1 <= 5, 否则爆炸
  8048db4:	83 e8 01             	sub    $0x1,%eax
  8048db7:	83 f8 05             	cmp    $0x5,%eax
  8048dba:	76 05                	jbe    8048dc1 <phase_6+0x38>
 
  8048dbc:	e8 32 04 00 00       	call   80491f3 <explode_bomb>
- 
+; if esi==6 跳出循环
  8048dc1:	83 c6 01             	add    $0x1,%esi
  8048dc4:	83 fe 06             	cmp    $0x6,%esi
  8048dc7:	74 33                	je     8048dfc <phase_6+0x73>
+; for (ebx = esi; ebx <= 5; ebx++)
+; 	if nums[ebx]==nums[esi-1]:
+;		explode
  8048dc9:	89 f3                	mov    %esi,%ebx
  8048dcb:	8b 44 9d c4          	mov    -0x3c(%ebp,%ebx,4),%eax
  8048dcf:	39 44 b5 c0          	cmp    %eax,-0x40(%ebp,%esi,4)
  8048dd3:	75 05                	jne    8048dda <phase_6+0x51>
+
  8048dd5:	e8 19 04 00 00       	call   80491f3 <explode_bomb>
+; ebx <= 5 跳回去
  8048dda:	83 c3 01             	add    $0x1,%ebx
  8048ddd:	83 fb 05             	cmp    $0x5,%ebx
  8048de0:	7e e9                	jle    8048dcb <phase_6+0x42>
+
  8048de2:	eb cc                	jmp    8048db0 <phase_6+0x27>
- 8048de4:	8b 52 08             	mov    0x8(%edx),%edx
+;--------------------以上是恶心人的二重循环----------------
+; 从base=0x804c154为开始连续存放了6个结点
+; 	value 	idx(没用) 	ptr
+;	194		1		   +12
+;   893     2
+;   356     3
+;   197     4
+;   844     5
+;   648     6
+;	然后下面的循环按nums[0-5]值的大小
+;    >1 ---->  第x-1个结点
+;   <=1 ---->  第0个结点
+;   指针存放在nums[6-11]
+ 8048de4:	8b 52 08             	mov    0x8(%edx),%edx ;这里是指向下一个结点(链表)
  8048de7:	83 c0 01             	add    $0x1,%eax
  8048dea:	39 c8                	cmp    %ecx,%eax
  8048dec:	75 f6                	jne    8048de4 <phase_6+0x5b>
- 8048dee:	89 54 b5 dc          	mov    %edx,-0x24(%ebp,%esi,4)
+ 8048dee:	89 54 b5 dc          	mov    %edx,-0x24(%ebp,%esi,4);nums[6]???
  8048df2:	83 c3 01             	add    $0x1,%ebx
  8048df5:	83 fb 06             	cmp    $0x6,%ebx
  8048df8:	75 07                	jne    8048e01 <phase_6+0x78>
  8048dfa:	eb 1c                	jmp    8048e18 <phase_6+0x8f>
- 8048dfc:	bb 00 00 00 00       	mov    $0x0,%ebx
+  
+; 	ebx = 0
+ 8048dfc:	bb 00 00 00 00       	mov    $0x0,%ebx;终于拆完二重循环了
+;L1: 
+; 	esi = ebx
+;  	ecx = num[ebx]
+;	eax = 1
+;	edx = 0x804c154(不知道是啥)
+;   if ecx > 1:
+;   	跳转回上面, 即如下
+;L2:
+; 		while True:
+; 			edx = edx + 0x8 // 这里不对, 应该是链表指向下一个结点
+; 			eax += 1
+;			if ecx == eax:
+;				break
+;		nums[6+esi] = edx
+;		
+;		ebx += 1
+;		if ebx != 6:
+;			goto L1(即外面有个ebx的for循环233)
+;		else:
+;			goto L3
+;	else:
+;		goto L2	
+;		
  8048e01:	89 de                	mov    %ebx,%esi
  8048e03:	8b 4c 9d c4          	mov    -0x3c(%ebp,%ebx,4),%ecx
  8048e07:	b8 01 00 00 00       	mov    $0x1,%eax
- 8048e0c:	ba 54 c1 04 08       	mov    $0x804c154,%edx
+ 8048e0c:	ba 54 c1 04 08       	mov    $0x804c154,%edx;内存中连续存放6个节点, 结点已经是从头串到位
  8048e11:	83 f9 01             	cmp    $0x1,%ecx
  8048e14:	7f ce                	jg     8048de4 <phase_6+0x5b>
  8048e16:	eb d6                	jmp    8048dee <phase_6+0x65>
+; 此处是按nums的顺序, 重新连接链表
+;L3:
+; 	ebx = *(ebp-0x24) // nums[6]
+; 	eax = ebp-0x24 //指针, 即nums[6]的地址
+; 	esi = ebp-0x10 //同上, nums[11]地址
  8048e18:	8b 5d dc             	mov    -0x24(%ebp),%ebx
  8048e1b:	8d 45 dc             	lea    -0x24(%ebp),%eax
  8048e1e:	8d 75 f0             	lea    -0x10(%ebp),%esi
- 8048e21:	89 d9                	mov    %ebx,%ecx
+ ; 	ecx = ebx
+ ;L4:
+ ; 	edx = *(eax+0x4) // nums[eax+1]
+ ; 	*(ecx+0x8) = edx // M[nums[ebx+2]] = nums[eax+1] 构建一个链表
+ ;  ecx = edx	
+ ; 	eax += 0x4		 // 	 
+ ; 	if eax != esi:	 //eax初值为num[11]地址, 最终值为nums[6]地址
+ ;		goto L4
+ ;	
+ 8048e21:	89 d9                	movp    %ebx,%ecx
+
  8048e23:	8b 50 04             	mov    0x4(%eax),%edx
  8048e26:	89 51 08             	mov    %edx,0x8(%ecx)
  8048e29:	83 c0 04             	add    $0x4,%eax
  8048e2c:	89 d1                	mov    %edx,%ecx
  8048e2e:	39 f0                	cmp    %esi,%eax
  8048e30:	75 f1                	jne    8048e23 <phase_6+0x9a>
- 8048e32:	c7 42 08 00 00 00 00 	movl   $0x0,0x8(%edx)
+
+ 8048e32:	c7 42 08 00 00 00 00 	movl   $0x0,0x8(%edx);最后一个结点指向0, 即NULL
  8048e39:	be 05 00 00 00       	mov    $0x5,%esi
+ ; 这里对链表从nums[6]->nums[11]两两相互检查, 如果前node值>后node值, 不爆炸(就是降序)
+ ; 	for (esi=5; esi!=0; esi--)
+ ;		eax = ebx+0x8
+ ;		eax = *(eax)
+ ; 		if *(ebx) > eax:
+ ;			ebx += 0x8
+ ;		else:
+ ;			explode
+ ; 
  8048e3e:	8b 43 08             	mov    0x8(%ebx),%eax
  8048e41:	8b 00                	mov    (%eax),%eax
  8048e43:	39 03                	cmp    %eax,(%ebx)
  8048e45:	7d 05                	jge    8048e4c <phase_6+0xc3>
+
  8048e47:	e8 a7 03 00 00       	call   80491f3 <explode_bomb>
- 8048e4c:	8b 5b 08             	mov    0x8(%ebx),%ebx
+
+ 8048e4c:	8b 5b 08             	mov    0x8(%ebx),%ebx ;链表指向下一个结点
  8048e4f:	83 ee 01             	sub    $0x1,%esi
  8048e52:	75 ea                	jne    8048e3e <phase_6+0xb5>
+
  8048e54:	8b 45 f4             	mov    -0xc(%ebp),%eax
  8048e57:	65 33 05 14 00 00 00 	xor    %gs:0x14,%eax
  8048e5e:	74 05                	je     8048e65 <phase_6+0xdc>
@@ -1077,6 +1152,7 @@ Disassembly of section .text:
  8049233:	55                   	push   %ebp
  8049234:	89 e5                	mov    %esp,%ebp
  8049236:	83 ec 08             	sub    $0x8,%esp
+ ;以下正文
  8049239:	8b 45 0c             	mov    0xc(%ebp),%eax
  804923c:	8d 50 14             	lea    0x14(%eax),%edx
  804923f:	52                   	push   %edx
@@ -1089,10 +1165,11 @@ Disassembly of section .text:
  804924c:	8d 50 04             	lea    0x4(%eax),%edx
  804924f:	52                   	push   %edx
  8049250:	50                   	push   %eax
- 8049251:	68 05 a4 04 08       	push   $0x804a405
+ 8049251:	68 05 a4 04 08       	push   $0x804a405; 六个%d
  8049256:	ff 75 08             	pushl  0x8(%ebp)
  8049259:	e8 b2 f5 ff ff       	call   8048810 <__isoc99_sscanf@plt>
  804925e:	83 c4 20             	add    $0x20,%esp
+ 
  8049261:	83 f8 05             	cmp    $0x5,%eax
  8049264:	7f 05                	jg     804926b <read_six_numbers+0x38>
  8049266:	e8 88 ff ff ff       	call   80491f3 <explode_bomb>
