@@ -372,9 +372,12 @@ Disassembly of section .text:
  8048bfa:	55                   	push   %ebp
  8048bfb:	89 e5                	mov    %esp,%ebp
  8048bfd:	83 ec 08             	sub    $0x8,%esp
+ ;以下正文
+ ; 所以0x8(%ebp)要等于×0x804d140(即cookie)
  8048c00:	8b 45 08             	mov    0x8(%ebp),%eax
  8048c03:	3b 05 40 d1 04 08    	cmp    0x804d140,%eax
  8048c09:	75 21                	jne    8048c2c <fizz+0x32>
+; fizz!
  8048c0b:	83 ec 04             	sub    $0x4,%esp
  8048c0e:	50                   	push   %eax
  8048c0f:	68 2e a2 04 08       	push   $0x804a22e
@@ -384,12 +387,15 @@ Disassembly of section .text:
  8048c22:	e8 24 06 00 00       	call   804924b <validate>
  8048c27:	83 c4 10             	add    $0x10,%esp
  8048c2a:	eb 13                	jmp    8048c3f <fizz+0x45>
+
+; print misfire
  8048c2c:	83 ec 04             	sub    $0x4,%esp
  8048c2f:	50                   	push   %eax
  8048c30:	68 a8 a0 04 08       	push   $0x804a0a8
  8048c35:	6a 01                	push   $0x1
  8048c37:	e8 34 fd ff ff       	call   8048970 <__printf_chk@plt>
  8048c3c:	83 c4 10             	add    $0x10,%esp
+
  8048c3f:	83 ec 0c             	sub    $0xc,%esp
  8048c42:	6a 00                	push   $0x0
  8048c44:	e8 67 fc ff ff       	call   80488b0 <exit@plt>
