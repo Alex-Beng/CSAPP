@@ -792,9 +792,11 @@ Disassembly of section .text:
 0804912b <getbuf>:
  804912b:	55                   	push   %ebp
  804912c:	89 e5                	mov    %esp,%ebp
+ 
  804912e:	83 ec 34             	sub    $0x34,%esp
  8049131:	8d 45 d8             	lea    -0x28(%ebp),%eax
-
+; eax 为 0x55683488
+; 0x556834b0
  8049134:	50                   	push   %eax;说明-0x28(%ebp)是字符串首
  8049135:	e8 60 fb ff ff       	call   8048c9a <Gets>
  804913a:	b8 01 00 00 00       	mov    $0x1,%eax
