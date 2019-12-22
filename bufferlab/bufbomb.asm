@@ -490,7 +490,7 @@ Disassembly of section .text:
 
  8048d5c:	89 45 f4             	mov    %eax,-0xc(%ebp)
  8048d5f:	e8 c7 03 00 00       	call   804912b <getbuf>
- 
+
  8048d64:	89 c3                	mov    %eax,%ebx
  8048d66:	e8 ca ff ff ff       	call   8048d35 <uniqueval>
  8048d6b:	8b 55 f4             	mov    -0xc(%ebp),%edx
@@ -788,7 +788,8 @@ Disassembly of section .text:
  804912c:	89 e5                	mov    %esp,%ebp
  804912e:	83 ec 34             	sub    $0x34,%esp
  8049131:	8d 45 d8             	lea    -0x28(%ebp),%eax
- 8049134:	50                   	push   %eax
+
+ 8049134:	50                   	push   %eax;说明-0x28(%ebp)是字符串首
  8049135:	e8 60 fb ff ff       	call   8048c9a <Gets>
  804913a:	b8 01 00 00 00       	mov    $0x1,%eax
  804913f:	c9                   	leave  
