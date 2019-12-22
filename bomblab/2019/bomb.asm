@@ -375,18 +375,25 @@ Disassembly of section .text:
 08048b51 <phase_2>:
  8048b51:	55                   	push   %ebp
  8048b52:	89 e5                	mov    %esp,%ebp
+
+; 保护寄存器
  8048b54:	53                   	push   %ebx
+
+; 栈保护机制
  8048b55:	83 ec 2c             	sub    $0x2c,%esp
  8048b58:	65 a1 14 00 00 00    	mov    %gs:0x14,%eax
  8048b5e:	89 45 f4             	mov    %eax,-0xc(%ebp)
+
  8048b61:	31 c0                	xor    %eax,%eax
  8048b63:	8d 45 dc             	lea    -0x24(%ebp),%eax
+
  8048b66:	50                   	push   %eax
  8048b67:	ff 75 08             	pushl  0x8(%ebp)
  8048b6a:	e8 c4 06 00 00       	call   8049233 <read_six_numbers>
+
  8048b6f:	83 c4 10             	add    $0x10,%esp ;pop
  8048b72:	83 7d dc 00          	cmpl   $0x0,-0x24(%ebp)
- 8048b76:	79 05                	jns    8048b7d <phase_2+0x2c>
+ 8048b76:	79 05                	jns    8048b7d <phase_2+0x2c>;jnss只看符号位，所以只需要第一个数大于0即可
  8048b78:	e8 76 06 00 00       	call   80491f3 <explode_bomb>
 ;大概是 for (int i=0; i<6; i++)
 ; 			nums[i] = nums[i-1]+i
@@ -402,6 +409,7 @@ Disassembly of section .text:
  8048b96:	83 fb 06             	cmp    $0x6,%ebx
  8048b99:	75 e7                	jne    8048b82 <phase_2+0x31>
 
+; 与上面的一起保护栈结构
  8048b9b:	8b 45 f4             	mov    -0xc(%ebp),%eax
  8048b9e:	65 33 05 14 00 00 00 	xor    %gs:0x14,%eax
  8048ba5:	74 05                	je     8048bac <phase_2+0x5b>

@@ -3,7 +3,9 @@ ishow
 btest
 fshow
 bomb
-
+bufbomb
+hex2raw
+makecookie
 *.out
 *.o
 *.exe
