@@ -790,7 +790,7 @@ Disassembly of section .text:
  804912a:	c3                   	ret    
 
 0804912b <getbuf>:
- 804912b:	55                   	push   %ebp
+ 804912b:	55                   	push   %ebp ;0x556834d0
  804912c:	89 e5                	mov    %esp,%ebp
  
  804912e:	83 ec 34             	sub    $0x34,%esp

@@ -1,3 +1,3 @@
-movl $0x22d99eca, 0x804d138
-pushl $0x08048c49
+movl  $0x22d99eca, %eax
+push $0x8048d64
 ret
