@@ -533,7 +533,12 @@ Disassembly of section .text:
  8048dc6:	89 e5                	mov    %esp,%ebp
  8048dc8:	53                   	push   %ebx
  8048dc9:	83 ec 14             	sub    $0x14,%esp
+ ; ebp = esp
+ ; esp -= 0x4
+ ; esp -= 0x14
+ ;===> ebp = esp+0x18
  8048dcc:	e8 64 ff ff ff       	call   8048d35 <uniqueval>
+ 
  8048dd1:	89 45 f4             	mov    %eax,-0xc(%ebp)
  8048dd4:	e8 68 03 00 00       	call   8049141 <getbufn>
  8048dd9:	89 c3                	mov    %eax,%ebx
@@ -807,8 +812,16 @@ Disassembly of section .text:
  8049141:	55                   	push   %ebp
  8049142:	89 e5                	mov    %esp,%ebp
  8049144:	81 ec 14 02 00 00    	sub    $0x214,%esp
- 804914a:	8d 85 f8 fd ff ff    	lea    -0x208(%ebp),%eax
+ 804914a:	8d 85 f8 fd ff ff    	lea    -0x208(%ebp),%eax;0x208, 即520 :)
  8049150:	50                   	push   %eax
+ ;五次起始地址
+ ;0x556832a8 -> 0x55683318
+ 
+ ;0x556832a8
+ ;0x556832e8
+ ;0x55683268
+ ;0x55683308
+ ;0x55683318
  8049151:	e8 44 fb ff ff       	call   8048c9a <Gets>
  8049156:	b8 01 00 00 00       	mov    $0x1,%eax
  804915b:	c9                   	leave  
