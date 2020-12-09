@@ -274,9 +274,10 @@ int addOK(int x, int y) {
  *   Rating: 3
  */
 int ezThreeFourths(int x) {
+    int sgn, m;
       x+=x<<1;//x*3
-    int sgn=x>>31;
-    int m= 3&sgn;//掩码偏差
+    sgn=x>>31;
+    m= 3&sgn;//掩码偏差
     x+=m;
 //x/4
   return x>>2;
@@ -319,7 +320,12 @@ int rempwr2(int x, int n) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
-  return 2;
+  // 分成左边和右边
+  int _32_n = (32+(~n+1));// 32-n
+  int left_mask = ~((~0)<<_32_n);
+  int left = (x>>n)&left_mask;
+  int right = x<<_32_n;
+  return left|right;
 }
 /* 
  * greatestBitPos - return a mask that marks the position of the
@@ -330,7 +336,14 @@ int rotateRight(int x, int n) {
  *   Rating: 4 
  */
 int greatestBitPos(int x) {
-  return 2;
+  // 利用二分，将MSB拓展到最低位
+  // 特殊情况，MSB为最高位时，拓展后取反为0，需特殊处理
+  x = x | x>>1;
+  x = x | x>>2;
+  x = x | x>>4;
+  x = x | x>>8;
+  x = x | x>>16;
+  return x & ((~x>>1)^(1<<31));
 }
 /* 
  * bang - Compute !x without using !
@@ -340,7 +353,14 @@ int greatestBitPos(int x) {
  *   Rating: 4 
  */
 int bang(int x) {
-  return 2;
+  // 跟上一题一样二分做
+  x = x | x>>16;
+  x = x | x>>8;
+  x = x | x>>4;
+  x = x | x>>2;
+  x = x | x>>1;
+  // 取最后一位, 然后取反
+  return (x&1)^1;
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
@@ -355,7 +375,25 @@ int bang(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-
+  int S = uf&0x80000000;
+  int E = uf&0x7F800000;
+  int F = uf&0x007FFFFF;
+  int abs;
+  if (!E) {// 0/非规约
+    return 0;
+  }
+  else if (E == 0x7f800000) {// 无穷和nan
+    return 0x80000000;
+  }
+  else {// 规约
+    E = E>>23;
+    // int无法表示的数
+    if (E<0x7f) {return 0;}
+    if (E>0x9d) {return 0x80000000;}
+    abs = (0x40000000+(F<<7))>>(157-E);
+    return S? -abs : abs;
+  }
+  
 
   return 2;
 }
@@ -379,8 +417,7 @@ unsigned float_twice(unsigned uf) {
 	if(E==0x7f800000 || !uf){
 	     return uf;
         }
-	else if(!E){
-	//非规约
+	else if(!E){ //非规约
 	int tmp=F;
 	F = F<<1;
 	if(tmp&0x400000){//非规约发生了上溢
